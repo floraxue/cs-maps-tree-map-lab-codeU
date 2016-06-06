@@ -3,13 +3,7 @@
  */
 package com.flatironschool.javacs;
 
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Implementation of a Map using a binary search tree.
@@ -36,8 +30,6 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		/**
 		 * @param key
 		 * @param value
-		 * @param left
-		 * @param right
 		 */
 		public Node(K key, V value) {
 			this.key = key;
@@ -72,7 +64,17 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		Comparable<? super K> k = (Comparable<? super K>) target;
 		
 		// the actual search
-        // TODO: Fill this in.
+        Node ptr = root;
+		while (ptr != null) {
+            int cmp = k.compareTo(ptr.key);
+            if (cmp == 0) {
+                return ptr;
+            } else if (cmp < 0) {
+                ptr = ptr.left;
+            } else {
+                ptr = ptr.right;
+            }
+        }
         return null;
 	}
 
@@ -92,6 +94,21 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
+        Node ptr = root;
+        Deque<Node> stack = new ArrayDeque<Node>();
+        stack.add(ptr);
+        while (!stack.isEmpty()) {
+            ptr = stack.removeFirst();
+            if (equals(target, ptr.value)) {
+                return true;
+            }
+            if (ptr.left != null) {
+                stack.addLast(ptr.left);
+            }
+            if (ptr.right != null) {
+                stack.addLast(ptr.right);
+            }
+        }
 		return false;
 	}
 
@@ -117,9 +134,18 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+        collectNodes(root, set);
 		return set;
 	}
+
+    private void collectNodes(Node node, Set<K> set) {
+        if (node == null) {
+            return;
+        }
+        collectNodes(node.left, set);
+        set.add(node.key);
+        collectNodes(node.right, set);
+    }
 
 	@Override
 	public V put(K key, V value) {
@@ -135,7 +161,34 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
+        if (containsKey(key)) {
+            Node target = findNode(key);
+            V prevV = target.value;
+            target.value = value;
+            return prevV;
+        } else {
+            Comparable<? super K> k = (Comparable<? super K>) key;
+            int cmp = k.compareTo(node.key);
+            if (cmp < 0) {
+                if (node.left == null) {
+                    node.left = makeNode(key, value);
+                    size++;
+                    return null;
+                } else {
+                    V prevV = putHelper(node.left, key, value);
+                    return prevV;
+                }
+            } else if (cmp > 0) {
+                if (node.right == null) {
+                    node.right = makeNode(key, value);
+                    size++;
+                    return null;
+                } else {
+                    V prevV = putHelper(node.right, key, value);
+                    return prevV;
+                }
+            }
+        }
         return null;
 	}
 
