@@ -112,6 +112,26 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		return false;
 	}
 
+//    public boolean containsValue(Object target) {
+//        return containsValueHelper(root, target);
+//    }
+//
+//    private boolean containsValueHelper(Node node, Object target) {
+//        if (node == null) {
+//            return false;
+//        }
+//        if (equals(target, node.value)) {
+//            return true;
+//        }
+//        if (containsValueHelper(node.left, target)) {
+//            return true;
+//        }
+//        if (containsValueHelper(node.right, target)) {
+//            return true;
+//        }
+//        return false;
+//    }
+
 	@Override
 	public Set<Map.Entry<K, V>> entrySet() {
 		throw new UnsupportedOperationException();
